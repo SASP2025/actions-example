@@ -1,0 +1,57 @@
+# Schema: https://json.schemastore.org/github-action.json
+name: 'Greeting Python Action'
+description: 'Greetings with a composite action step'
+inputs:
+  input_name: 
+    description: 'Who am I talking to'
+    required: true
+    default: 'Awesomesauce'
+  python_version:
+    description: |
+      Python Version 
+      Default is '3.13'
+    default: '3.13'
+
+outputs:
+  greeting_time:
+    description: 'Initial meeting time'
+    value: $${{ steps.get-time.outputs.greeting_time}}
+  output_name:
+    description: 'The scrubbed input name'
+    value: $${{ steps.greet.outputs.output_name }}
+
+# GitHub provides 3 options, Docker, Javascript, Composite
+runs: 
+  using: composite
+  steps:
+    - name: Setup Python
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: Set GitHub Path  # to locate the python scripts in the runner
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+
+    - name: Get the time
+      id: get-time
+      shell: bash
+      run: |
+        python ./.github/jobs/greeting/get_time.py
+
+    - name: Scrub inputs
+      id: scrub-inputs
+      shell: bash
+      run: |
+        echo "input_name_scrub='${{ inputs.input_name }}'" >> "$GITHUB_OUTPUT"
+
+    - name: Greet the person
+      id: greet
+      shell: bash
+      run: |
+        python ./.github/jobs/greeting/greetings.py ${{ steps.scrub-inputs.outputs.input_name_scrub }} ${{ steps.get-time.outputs.greeting_time }}
+    
+

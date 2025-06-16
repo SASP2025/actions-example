@@ -1,0 +1,120 @@
+name: Test greeting action
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Which environment to use'
+        required: true
+        default: develop
+        options:
+          - develop
+          - production
+permissions:
+  contents: read
+
+
+jobs:
+  run-production:
+    if: ${{ github.event.inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    name: Verify Two people
+    strategy:
+      # This matrix should generate 2 tests
+      matrix:
+        input_name: ["George", "Mary"]
+        python_version: ["3.12"]
+
+    steps:
+      # checkout is required because the action is not published
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Greet me
+        id: get_greeting
+        uses: ./.github/jobs/greeting #uses local action
+        with:
+          input_name: ${{ matrix.input_name }}
+          python_version: ${{ matrix.python_version }}
+      - name: Log environment
+        run: |
+          echo '#### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+
+
+  run-develop:
+    if: ${{ github.event.inputs.environment == 'develop' }}
+    runs-on: ubuntu-latest
+    name: Verify Two people
+    strategy:
+      # This matrix should generate 2 tests
+      matrix:
+        input_name: ["George"]
+        python_version: ["3.12", "3.13"]
+        
+    steps:
+      # checkout is required because the action is not published
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Greet me
+        id: get_greeting
+        uses: ./.github/jobs/greeting #uses local action
+        with:
+          input_name: ${{ matrix.input_name }}
+          python_version: ${{ matrix.python_version }}
+
+      - name: Log environment
+        run: |
+          echo '#### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+
+  test-empty-input:
+    runs-on: ubuntu-latest
+    name: Verify failed name input and default python
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Greet me
+        id: get_greeting
+        uses: ./.github/jobs/greeting #uses local action
+        with:
+          input_name: ""  # will return an input error for the python script
+        continue-on-error: true
+
+      - name: Log environment
+        run: |
+          echo '#### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: check_error
+        if: ${{ !cancelled() && steps.get_greeting.outcome == 'success'}}
+        run: exit 1
+
+
+
+  test-hacker-input:
+    runs-on: ubuntu-latest
+    name: Verify hacker input fails
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Greet me
+        id: get_greeting
+        uses: ./.github/jobs/greeting  # uses local action
+        with:
+          input_name: "Snake; ls /home/*"  # currently prints to log
+        continue-on-error: true
+
+      - name: Log environment
+        run: |
+          echo '#### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: check_error
+        if: ${{ !cancelled() && steps.get_greeting.outcome == 'success'}}
+        run: exit 1
+
+
+
+        
