@@ -1,0 +1,80 @@
+# This workflow tests the run of pytest
+# and if pytest-cov is available, the coverage report
+# run this test to see if the action works
+name: Test pytest action
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Which environment to use'
+        required: true
+        default: production
+        options:
+          - production
+
+
+permissions:
+  contents: read
+
+
+jobs:
+  test-production-with-coverage:
+    if: ${{ github.event.inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    name: Test in production environment with coverage
+
+    steps:
+      # checkout is required because the action is not published
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[tests]
+
+      - name: Run pytests
+        id: run_pytests
+        uses: ./.github/jobs/pytest #uses local action
+        with:
+          coverage: true
+
+      - name: Log environment
+        run: |
+          echo '### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: check_error
+        if: ${{ cancelled() || steps.run_pytests.outcome != 'success'}}
+        run: exit 1
+
+
+  test-production-without-coverage:
+    if: ${{ github.event.inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    name: Test in production environment without coverage
+
+    steps:
+      # checkout is required because the action is not published
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[tests]
+
+      - name: Run pytests
+        id: run_pytests
+        uses: ./.github/jobs/pytest #uses local action
+        with:
+          coverage: false
+
+      - name: Log environment
+        run: |
+          echo '### Environment Used: ${{ inputs.environment }}' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: check_error
+        if: ${{ cancelled() && steps.run_pytests.outcome != 'success'}}
+        run: exit 1
+

@@ -1,4 +1,5 @@
 # Schema: https://json.schemastore.org/github-action.json
+# This is a catch all example for resuable jobs
 name: 'Greeting Python Action'
 description: 'Greetings with a composite action step'
 inputs:

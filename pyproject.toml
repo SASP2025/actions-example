@@ -1,0 +1,46 @@
+[project]
+name = "actions_examples"
+description = "Actions testing package"
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["version"]
+authors = [{ name = "My Name"}]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 3 - Alpha",
+]
+
+license-files = ["LICENSE"]
+
+dependencies = [
+  "setuptools_scm",
+]
+
+[build-system]
+requires = [
+  "setuptools>=62.1",
+  "setuptools_scm[tomli]>=6.2",
+  "wheel",
+  "pip>=24.0",
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.pytest.ini_options]
+# these are used to flex the pytest action
+pythonpath = ["tests/","src/"]
+addopts = "-v" 
+
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.setuptools_scm]
+# can be empty if no extra settings are needed, presence enables setuptools-scm
+version_file = "src/_version.py"

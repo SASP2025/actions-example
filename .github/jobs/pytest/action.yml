@@ -1,0 +1,34 @@
+# This action will execute pytest
+# Schema: https://json.schemastore.org/github-action.json
+# This should include a GitHub summary report in the test
+# It is up to the workflow caller to setup their environment
+# setup configuration for pytest should be in a pyproject.toml file
+# you may need to edit the toml to get all the options, but coverage should be here
+name: 'Execute pytest'
+description: 'Run tests with pytest and provide GitHub Job Summaries report'
+inputs:
+  coverage:
+    description: Run coverage with pytest? 
+    type: boolean
+    default: true
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+
+    # identify if coverage should be used
+    - name: "Use coverage"
+      
+    
+    - name: "Dont use coverage"
+        
+
+    # pytest with the configured options and coverage
+    - name: "run pytest"
+
+    # return the report summary even if pytest fails and coverage is requested
+    - name: "Get Coverage Report"
+      
+
+

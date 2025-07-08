@@ -1,3 +1,5 @@
+# This tests the simple greeting action
+# which is meant as a catch all example of reusable jobs
 name: Test greeting action
 on:
   workflow_dispatch:
