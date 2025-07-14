@@ -28,12 +28,12 @@ runs:
     - name: Set coverage mode
       shell: bash
       run: |
-        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV
+        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV  >> $GITHUB_STEP_SUMMARY
 
     - name: Debug — show what pytest collects
       shell: bash
       run: |
-        echo "🔍 Showing what pytest collects:"
+        echo " Showing what pytest collects:"
         pytest --collect-only -q || true
         echo ""
 
