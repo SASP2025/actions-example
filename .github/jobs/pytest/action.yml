@@ -38,6 +38,10 @@ runs:
     - name: run pytest
       shell: bash
       run: |
+        echo " Showing what pytest collects:"
+        pytest --collect-only -q || true
+        echo ""
+        
         if [ "$COVERAGE" = "true" ]; then
           echo "Running pytest with coverage..."
           pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short
