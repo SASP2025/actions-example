@@ -12,7 +12,12 @@ inputs:
     type: boolean
     default: true
     required: false
-
+    
+   coverage-target:
+    description: "Which folder to measure coverage on?"
+    required: false
+    default: "src"
+    
 runs:
   using: "composite"
   steps:
@@ -35,7 +40,7 @@ runs:
       run: |
         if [ "$COVERAGE" = "true" ]; then
           echo "Running pytest with coverage..."
-          pytest --cov=src --cov-report=term-missing --tb=short
+          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short
         else
           echo "Running pytest without coverage..."
           pytest --tb=short
@@ -55,7 +60,7 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
         if [ "$COVERAGE" = "true" ]; then
-          pytest --cov=src --cov-report=term-missing --tb=short || true
+          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short || true
         else
           pytest --tb=short || true
         fi
