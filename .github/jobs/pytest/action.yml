@@ -28,7 +28,7 @@ runs:
     - name: Set coverage mode
       shell: bash
       run: |
-        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV 
+        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_STEP_SUMMARY               #GITHUB_ENV 
 
     - name: Debug — show what pytest collects
       shell: bash
