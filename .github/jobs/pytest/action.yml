@@ -18,17 +18,47 @@ runs:
   steps:
 
     # identify if coverage should be used
-    - name: "Use coverage"
+    - name: check out code
+      uses: actions/checkout@v4
       
-    
-    - name: "Dont use coverage"
+    #set up a default environment variable we can read later
+    - name: Set coverage Mode 
+      shell: bash
+      run: |
+        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV
         
 
-    # pytest with the configured options and coverage
-    - name: "run pytest"
+    # pytest with the configured options and coverage (with or without coverage)
+    - name: run pytest
+      shell: bash
+      run: |
+        if [ "$COVERAGE" = "true" ]; then
+          echo "Running pytest with coverage..."
+          pytest --cov=src --cov-report=term-missing --tb=short
+        else
+          echo "Running pytest without coverage..."
+          pytest --tb=short
+        fi
 
     # return the report summary even if pytest fails and coverage is requested
-    - name: "Get Coverage Report"
+    - name: save pytest summary to GitHub Job summary
+      shell: bash
+      run: |
+        echo "## Pytest Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "$COVERAGE" = "true" ]; then
+          echo " Coverage was enabled." >> $GITHUB_STEP_SUMMARY
+        else
+          echo " Coverage was disabled." >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        if [ "$COVERAGE" = "true" ]; then
+          pytest --cov=src --cov-report=term-missing --tb=short || true
+        else
+          pytest --tb=short || true
+        fi
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
       
 
 
