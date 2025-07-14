@@ -42,7 +42,7 @@ runs:
       run: |
         if [ "$COVERAGE" = "true" ]; then
           echo "Running pytest with coverage..."
-          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short
+          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short >> $GITHUB_STEP_SUMMARY
         else
           echo "Running pytest without coverage..."
           pytest --tb=short
