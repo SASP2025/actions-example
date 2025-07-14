@@ -6,42 +6,40 @@
 # you may need to edit the toml to get all the options, but coverage should be here
 name: 'Execute pytest'
 description: 'Run tests with pytest and provide GitHub Job Summaries report'
+
 inputs:
   coverage:
-    description: Run coverage with pytest? 
+    description: Run coverage with pytest?
     type: boolean
     default: true
     required: false
-    
+
   coverage-target:
     description: "Which folder to measure coverage on?"
     required: false
     default: "src"
-    
+
 runs:
   using: "composite"
   steps:
-
-    # identify if coverage should be used
-
-    - name: check out code
+    - name: Checkout code
       uses: actions/checkout@v4
-      
-    #set up a default environment variable we can read later
-    - name: Set coverage Mode 
+
+    - name: Set coverage mode
       shell: bash
       run: |
         echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV
-        
 
-    # pytest with the configured options and coverage (with or without coverage)
-    - name: run pytest
+    - name: Debug — show what pytest collects
       shell: bash
       run: |
-        echo " Showing what pytest collects:"
+        echo "🔍 Showing what pytest collects:"
         pytest --collect-only -q || true
         echo ""
-        
+
+    - name: Run pytest
+      shell: bash
+      run: |
         if [ "$COVERAGE" = "true" ]; then
           echo "Running pytest with coverage..."
           pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short
@@ -50,16 +48,14 @@ runs:
           pytest --tb=short
         fi
 
-    # return the report summary even if pytest fails and coverage is requested
-    - name: save pytest summary to GitHub Job summary
+    - name: Save summary to GitHub Job Summary
       shell: bash
       run: |
         echo "## Pytest Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
         if [ "$COVERAGE" = "true" ]; then
-          echo " Coverage was enabled." >> $GITHUB_STEP_SUMMARY
+          echo "Coverage enabled for: ${{ inputs.coverage-target }}" >> $GITHUB_STEP_SUMMARY
         else
-          echo " Coverage was disabled." >> $GITHUB_STEP_SUMMARY
+          echo "Coverage disabled." >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
@@ -69,7 +65,3 @@ runs:
           pytest --tb=short || true
         fi
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-      
-
-
