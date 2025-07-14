@@ -13,7 +13,7 @@ inputs:
     default: true
     required: false
     
-   coverage-target:
+  coverage-target:
     description: "Which folder to measure coverage on?"
     required: false
     default: "src"
