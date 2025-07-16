@@ -48,24 +48,25 @@ runs:
           pytest --tb=short
         fi
 
-    - name: Save Pytest and Coverage Summary
-      shell: bash
-      run: |
-       echo "##  Pytest Results & Coverage Summary" >> $GITHUB_STEP_SUMMARY
-       echo "" >> $GITHUB_STEP_SUMMARY
-       echo "Platform: \`$(python --version)\`" >> $GITHUB_STEP_SUMMARY
-       echo "" >> $GITHUB_STEP_SUMMARY
-
+   - name: Save Pytest and Coverage Summary
+     shell: bash
+     run: |
+       echo "## Pytest Results " >> $GITHUB_STEP_SUMMARY
        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
        if [ "$COVERAGE" = "true" ]; then
-         echo " Running pytest with coverage..." >> $GITHUB_STEP_SUMMARY
          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short >> $GITHUB_STEP_SUMMARY || true
        else
-         echo " Coverage disabled. Running pytest only..." >> $GITHUB_STEP_SUMMARY
          pytest --tb=short >> $GITHUB_STEP_SUMMARY || true
        fi
-
        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+       echo "## Pytest Coverage Report " >> $GITHUB_STEP_SUMMARY
+       if [ "$COVERAGE" = "true" ]; then
+         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+         coverage report >> $GITHUB_STEP_SUMMARY || true
+         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      else
+      echo "_Coverage disabled._" >> $GITHUB_STEP_SUMMARY
+      fi
 
     
