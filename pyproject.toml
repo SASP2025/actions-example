@@ -39,6 +39,7 @@ addopts = "-v"
 tests = [
     "pytest",
     "pytest-cov",
+    "coverage",
 ]
 
 [tool.setuptools_scm]
