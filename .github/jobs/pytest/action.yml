@@ -1,71 +1,47 @@
-# This action will execute pytest
+# This action will execute pytest and coverage
 # Schema: https://json.schemastore.org/github-action.json
 # This should include a GitHub summary report in the test
 # It is up to the workflow caller to setup their environment
 # setup configuration for pytest should be in a pyproject.toml file
-# you may need to edit the toml to get all the options, but coverage should be here
+# Schema: https://json.schemastore.org/github-action.json
 name: 'Execute pytest'
 description: 'Run tests with pytest and provide GitHub Job Summaries report'
-
 inputs:
   coverage:
-    description: Run coverage with pytest?
+    description: Run coverage with pytest? 
     type: boolean
     default: true
     required: false
 
-  coverage-target:
-    description: "Which folder to measure coverage on?"
-    required: false
-    default: "src"
-
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
 
-    - name: Set coverage mode
+    # identify if coverage should be used
+    - name: "Use coverage"
+      shell: bash
+      if: ${{ fromJSON(inputs.coverage) == true }}
+      run: echo "COVERAGE_ARGS=--cov --cov-report=" >> $GITHUB_ENV
+    
+    - name: "Dont use coverage"
+      shell: bash
+      if: ${{ fromJSON(inputs.coverage) == false }}
+      run: echo "COVERAGE_ARGS= " >> $GITHUB_ENV
+        
+
+    # pytest with the configured options and coverage
+    - name: "run pytest"
+      id: run_pytest
       shell: bash
       run: |
-        echo "COVERAGE=${{ inputs.coverage }}" >> $GITHUB_ENV
+        echo "# Pytest Results :rocket: " >> $GITHUB_STEP_SUMMARY
+        pytest --cache-clear ${{ env.COVERAGE_ARGS }} >> $GITHUB_STEP_SUMMARY 
 
-    - name: Debug — show what pytest collects
+    # return the report summary even if pytest fails and coverage is requested
+    - name: "Get Coverage Report"
+      id: capture_coverage
       shell: bash
+      if: ${{ fromJSON(inputs.coverage) == true }}
       run: |
-        echo " Showing what pytest collects:"
-        pytest --collect-only -q || true
-        echo ""
-
-    - name: Run pytest
-      shell: bash
-      run: |
-        if [ "$COVERAGE" = "true" ]; then
-          echo "Running pytest with coverage..."
-          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short >> $GITHUB_STEP_SUMMARY
-        else
-          echo "Running pytest without coverage..."
-          pytest --tb=short
-        fi
-
-    - name: Save Pytest and Coverage Summary
-      shell: bash
-      run: |
-        echo "##  Pytest Results" >> $GITHUB_STEP_SUMMARY
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        if [ "$COVERAGE" = "true" ]; then
-          pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short >> $GITHUB_STEP_SUMMARY || true
-        else
-          pytest --tb=short >> $GITHUB_STEP_SUMMARY || true
-        fi
-        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-
-        echo "##  Pytest Coverage Report" >> $GITHUB_STEP_SUMMARY
-        if [ "$COVERAGE" = "true" ]; then
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          coverage report >> $GITHUB_STEP_SUMMARY || true
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "_Coverage disabled._" >> $GITHUB_STEP_SUMMARY
-        fi
+        echo "# Pytest Coverage Report :bowtie: " >> $GITHUB_STEP_SUMMARY
+        echo "$(coverage report --format=markdown)" >> $GITHUB_STEP_SUMMARY
