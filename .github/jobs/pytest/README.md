@@ -1,6 +1,4 @@
 
-## EXPLANATION OF EACH SECTION OF THE ACTION FILE
-
 #  Pytest Action for GitHub Workflows
 
 This is a custom GitHub Action that runs your Python tests using `pytest`. It can also show code coverage results if you enable it. The action is designed to be reusable across different repositories or projects.
@@ -24,7 +22,7 @@ When you use it in your workflow, it will show the test results (and optionally 
 | `coverage`        | boolean | no       | `true`  | Whether to run pytest with code coverage                    |
 | `coverage-target` | string  | no       | `"src"` | The folder or package name to check coverage for            |
 
->  You can change `"src"` to match the folder where your Python code lives — like `exercise_package` or `my_app`.
+>  You can change `"src"` to match the folder where your Python code lives — like `exercise_package` or `my_code`.
 
 ---
 
