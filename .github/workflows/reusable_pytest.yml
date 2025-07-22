@@ -11,7 +11,7 @@ on:
       coverage-target:
         required: false
         type: string
-        default: exercise_package
+        default: src
 
 jobs:
   test:
