@@ -7,11 +7,9 @@ on:
       coverage:
         required: false
         type: boolean
-        #default: true
       coverage-target:
         required: false
         type: string
-        #default: src
 
 jobs:
   test:
@@ -31,8 +29,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
 
-      - name: Run shared pytest action
-        uses: ./.github/jobs/pytest
-        with:
-          coverage: ${{ inputs.coverage }}
-          coverage-target: ${{ inputs.coverage-target }}
+      - name: Run pytest and coverage
+        shell: bash
+        run: |
+          echo "## Pytest Results " >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform**: \`$(python --version)\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.coverage }}" = "true" ]; then
+            pytest --cov=${{ inputs.coverage-target }} --cov-report=term-missing --tb=short >> $GITHUB_STEP_SUMMARY || true
+          else
+            pytest --tb=short >> $GITHUB_STEP_SUMMARY || true
+          fi
+
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
