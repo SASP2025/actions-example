@@ -7,11 +7,11 @@ on:
       coverage:
         required: false
         type: boolean
-        default: true
+        #default: true
       coverage-target:
         required: false
         type: string
-        default: src
+        #default: src
 
 jobs:
   test:
