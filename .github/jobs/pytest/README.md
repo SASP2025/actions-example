@@ -1,9 +1,9 @@
 
 #  Pytest Action for GitHub Workflows
 
-This is a custom GitHub Action that runs your Python tests using `pytest`. It can also show code coverage results if you enable it. The action is designed to be reusable across different repositories or projects.
+This is a custom GitHub Action that runs your Python tests using `pytest`. It can also show code coverage results if you enable it. The action is designed to be reusable across different repositories or projects. 
 
-When you use it in your workflow, it will show the test results (and optionally coverage) directly in the GitHub Actions Job Summary.
+It prints the test results directly in the GitHub Actions Job Summary so it's easier to see what passed or failed without digging through logs.
 
 ---
 
@@ -12,7 +12,8 @@ When you use it in your workflow, it will show the test results (and optionally 
 - Runs your test suite using `pytest`
 - Supports optional coverage reporting using `pytest-cov`
 - Outputs both test results and coverage summary in the GitHub Actions Job Summary panel
-
+- Only runs coverage **if** it’s enabled — no unnecessary reruns or noise
+  
 ---
 
 ##  Inputs
@@ -61,5 +62,4 @@ jobs:
         with:
           coverage: true
           coverage-target: exercise_package
-
 
