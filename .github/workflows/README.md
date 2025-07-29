@@ -1,7 +1,9 @@
 
 # Test Workflow with Pytest
 
-This GitHub Actions workflow tests Python code using `pytest`. If `pytest-cov` is available, it also includes a coverage report.
+The pytest GitHub Actions workflow tests Python code using `pytest`. If `pytest-cov` is available, it also includes a coverage report.
+
+There are "test_*" files in this directory which are used to test the actions themselves and should not be called by other repositories.
 
 ## What this workflow does
 
@@ -14,8 +16,9 @@ This GitHub Actions workflow tests Python code using `pytest`. If `pytest-cov` i
 
 This file lives in:  .github/workflows
 
-
 You can trigger it manually from GitHub by selecting the **Run workflow** button and choosing the environment (`production` for now).
+
+When testing from an external repository, you'll want to call the action with specific triggers for things like pull requests.
 
 ## Inputs
 
@@ -31,21 +34,21 @@ Make sure your repo is set up like this:
 - Your Python package is installable (`pyproject.toml` exists and has a `[project.optional-dependencies] tests = [...]` section)
 - You’ve included `pytest` and `pytest-cov` under `[project.optional-dependencies.tests]`
 - Your package folder (like `my_package/`) has an `__init__.py` so it can be imported
-- Your tests live in a `tests/` folder and are named like `test_*.py`
+- Your tests follow pytest expectations and what you've specified in your pyproject.toml file 
 
 ##  Example usage
 
-Here’s how this test workflow runs two jobs:
+In order to execute the pytest reusable workflow, make sure it is called as a job:
 
 ```yaml
   test-production-with-coverage:
-    uses: ./.github/workflows/test_pytest_action.yml
+    uses: SASP2025/actions-example/.github/workflows/reusable_pytest.yml
     with:
       coverage: true
       environment: production
 
   test-production-without-coverage:
-    uses: ./.github/workflows/test_pytest_action.yml
+    uses: SASP2025/actions-example/.github/workflows/reusable_pytest.yml
     with:
       coverage: false
       environment: production
